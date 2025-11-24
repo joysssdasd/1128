@@ -20,7 +20,10 @@
     "lint": "eslint server --ext .ts,.tsx",
     "lint:fix": "eslint server --ext .ts,.tsx --fix",
     "format": "prettier --write server/**/*.{ts,tsx}",
-    "db:seed": "tsx prisma/seed.ts"
+    "db:seed": "tsx prisma/seed.ts",
+    "commit": "node auto-commit.js",
+    "auto-commit": "node auto-commit.js",
+    "ac": "node auto-commit.js"
   },
   "keywords": [
     "trading",
