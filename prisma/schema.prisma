@@ -1,0 +1,269 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// 用户表
+model User {
+  id                BigInt    @id @default(autoincrement())
+  phone             String    @unique @db.VarChar(11)
+  wechatId          String    @unique @map("wechat_id") @db.VarChar(50)
+  inviteCode        String?   @unique @map("invite_code") @db.VarChar(10)
+  points            Int       @default(100)
+  dealRate          Decimal   @default(0.00) @map("deal_rate") @db.Decimal(5, 2)
+  totalPosts        Int       @default(0) @map("total_posts")
+  totalDeals        Int       @default(0) @map("total_deals")
+  status            UserStatus @default(ACTIVE)
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  // 关联关系
+  posts             Post[]
+  pointTransactions PointTransaction[]
+  invitationsSent   Invitation[] @relation("Inviter")
+  invitationReceived Invitation? @relation("Invited")
+  postViews         PostView[]
+  rechargeOrders    RechargeOrder[]
+
+  @@map("users")
+  @@index([phone])
+  @@index([wechatId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// 用户状态枚举
+enum UserStatus {
+  ACTIVE
+  DISABLED
+  BANNED
+}
+
+// 交易信息表
+model Post {
+  id           BigInt      @id @default(autoincrement())
+  userId       BigInt      @map("user_id")
+  title        String      @db.VarChar(100)
+  keywords     String      @db.VarChar(200)
+  price        Decimal     @db.Decimal(10, 2)
+  tradeType    TradeType   @map("trade_type")
+  deliveryDate DateTime?   @map("delivery_date")
+  extraInfo    String?     @map("extra_info") @db.VarChar(100)
+  viewLimit    Int         @default(10) @map("view_limit")
+  viewCount    Int         @default(0) @map("view_count")
+  dealCount    Int         @default(0) @map("deal_count")
+  status       PostStatus  @default(ACTIVE)
+  expireAt     DateTime    @map("expire_at")
+  createdAt    DateTime    @default(now()) @map("created_at")
+  updatedAt    DateTime    @updatedAt @map("updated_at")
+
+  // 关联关系
+  user         User        @relation(fields: [userId], references: [id])
+  postViews    PostView[]
+
+  @@map("posts")
+  @@index([userId])
+  @@index([tradeType])
+  @@index([status, createdAt])
+  @@index([expireAt])
+  @@index([createdAt])
+  @@index([price])
+  @@index([viewCount])
+}
+
+// 交易类型枚举
+enum TradeType {
+  BUY       // 求购
+  SELL      // 出售
+  LONG      // 做多
+  SHORT     // 做空
+}
+
+// 信息状态枚举
+enum PostStatus {
+  ACTIVE    // 上架中
+  EXPIRED   // 已过期
+  DISABLED  // 已下架
+}
+
+// 积分流水表
+model PointTransaction {
+  id           BigInt             @id @default(autoincrement())
+  userId       BigInt             @map("user_id")
+  changeType   PointChangeType    @map("change_type")
+  changeAmount Int                @map("change_amount")
+  balanceAfter Int                @map("balance_after")
+  relatedId    BigInt?            @map("related_id")
+  description  String             @db.VarChar(200)
+  createdAt    DateTime           @default(now()) @map("created_at")
+
+  // 关联关系
+  user         User               @relation(fields: [userId], references: [id])
+
+  @@map("point_transactions")
+  @@index([userId])
+  @@index([changeType])
+  @@index([createdAt])
+}
+
+// 积分变动类型枚举
+enum PointChangeType {
+  RECHARGE     // 充值
+  PUBLISH      // 发布信息
+  VIEW         // 查看联系方式
+  INVITE_BONUS // 邀请奖励
+  INVITED_BONUS // 被邀请奖励
+  REFUND       // 退还
+  ADMIN_ADJUST // 管理员调整
+}
+
+// 邀请关系表
+model Invitation {
+  id           BigInt   @id @default(autoincrement())
+  inviterId    BigInt   @map("inviter_id")
+  invitedId    BigInt   @unique @map("invited_id")
+  inviteCode   String   @map("invite_code") @db.VarChar(10)
+  status       InviteStatus @default(PENDING)
+  completedAt  DateTime? @map("completed_at")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  // 关联关系
+  inviter      User     @relation("Inviter", fields: [inviterId], references: [id])
+  invited      User     @relation("Invited", fields: [invitedId], references: [id])
+
+  @@map("invitations")
+  @@index([inviterId])
+  @@index([invitedId])
+  @@index([inviteCode])
+  @@index([status])
+}
+
+// 邀请状态枚举
+enum InviteStatus {
+  PENDING     // 待完成
+  COMPLETED   // 已完成
+  EXPIRED     // 已过期
+}
+
+// 信息查看记录表
+model PostView {
+  id         BigInt   @id @default(autoincrement())
+  postId     BigInt   @map("post_id")
+  userId     BigInt   @map("user_id")
+  ipAddress  String?  @map("ip_address") @db.VarChar(45)
+  userAgent  String?  @map("user_agent") @db.Text
+  isDealt    Boolean  @default(false) @map("is_dealt")
+  dealtAt    DateTime? @map("dealt_at")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  // 关联关系
+  post       Post     @relation(fields: [postId], references: [id])
+  user       User     @relation(fields: [userId], references: [id])
+
+  @@map("post_views")
+  @@index([postId])
+  @@index([userId])
+  @@index([createdAt])
+  @@unique([postId, userId])
+}
+
+// 系统公告表
+model SystemAnnouncement {
+  id          BigInt            @id @default(autoincrement())
+  title       String            @db.VarChar(200)
+  content     String            @db.Text
+  priority    Int               @default(0)
+  isActive    Boolean           @default(true) @map("is_active")
+  createdBy   BigInt            @map("created_by")
+  createdAt   DateTime          @default(now()) @map("created_at")
+  updatedAt   DateTime          @updatedAt @map("updated_at")
+
+  @@map("system_announcements")
+  @@index([isActive])
+  @@index([priority])
+  @@index([createdAt])
+}
+
+// 敏感词表
+model SensitiveWord {
+  id          BigInt   @id @default(autoincrement())
+  word        String   @unique @db.VarChar(100)
+  category    String   @db.VarChar(50)
+  level       Int      @default(1) // 1:警告 2:删除 3:封号
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("sensitive_words")
+  @@index([word])
+  @@index([category])
+  @@index([isActive])
+}
+
+// 管理员用户表
+model AdminUser {
+  id          BigInt      @id @default(autoincrement())
+  username    String      @unique @db.VarChar(50)
+  password    String      @db.VarChar(255)
+  email       String?     @db.VarChar(100)
+  role        AdminRole   @default(ADMIN)
+  permissions String[]    @default([])
+  isActive    Boolean     @default(true) @map("is_active")
+  lastLoginAt DateTime?   @map("last_login_at")
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+
+  @@map("admin_users")
+  @@index([username])
+  @@index([role])
+}
+
+// 管理员角色枚举
+enum AdminRole {
+  SUPER_ADMIN  // 超级管理员
+  ADMIN        // 管理员
+  EDITOR       // 编辑员
+  VIEWER       // 查看员
+}
+
+// 充值订单表
+model RechargeOrder {
+  id              BigInt          @id @default(autoincrement())
+  orderNumber     String          @unique @map("order_number") @db.VarChar(32)
+  userId          BigInt          @map("user_id")
+  amount          Decimal         @db.Decimal(10, 2)
+  points          Int
+  paymentMethod   String?         @map("payment_method") @db.VarChar(50)
+  paymentStatus   PaymentStatus   @default(PENDING) @map("payment_status")
+  tradeNumber     String?         @map("trade_number") @db.VarChar(100)
+  confirmedAt     DateTime?       @map("confirmed_at")
+  confirmedBy     BigInt?         @map("confirmed_by")
+  remark          String?         @db.Text
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+
+  // 关联关系
+  user            User            @relation(fields: [userId], references: [id])
+
+  @@map("recharge_orders")
+  @@index([orderNumber])
+  @@index([userId])
+  @@index([paymentStatus])
+  @@index([createdAt])
+}
+
+// 支付状态枚举
+enum PaymentStatus {
+  PENDING    // 待支付
+  PAID       // 已支付
+  CONFIRMED  // 已确认
+  CANCELLED  // 已取消
+  REFUNDED   // 已退款
+}
