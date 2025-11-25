@@ -4,7 +4,7 @@ import { usePostStore } from '../stores/postStore';
 
 export const ProfilePage: React.FC = () => {
   const { user } = useAuthStore();
-  const { myPosts, fetchMyPosts, pagination, isLoading, deletePost } = usePostStore();
+  const { myPosts, fetchMyPosts, pagination, isLoading, deletePost, updatePost } = usePostStore();
   const [activeTab, setActiveTab] = useState<'posts' | 'points' | 'stats'>('posts');
   const [pointsHistory] = useState<any[]>([]);
 
@@ -49,7 +49,7 @@ export const ProfilePage: React.FC = () => {
     }
 
     try {
-      await updatePostStatus(postId, newStatus as any);
+      await updatePost(postId, { status: newStatus });
       alert(`${action}成功`);
       fetchMyPosts({ page: 1, limit: 10 });
     } catch (error: any) {
