@@ -123,6 +123,15 @@ class Server {
   }
 
   private setupRoutes(): void {
+    // 静态文件服务（用于用户头像等）
+    this.app.use('/uploads', express.static('uploads'));
+
+    // 前端静态文件服务（生产环境）- 必须放在其他路由之前
+    if (config.app.env === 'production') {
+      // 服务前端构建文件
+      this.app.use(express.static(path.join(__dirname, '../client/dist')));
+    }
+
     // 根路由 - 生产环境返回前端页面，开发环境返回API信息
     this.app.get('/', (req, res) => {
       // 生产环境返回前端index.html
@@ -180,15 +189,8 @@ class Server {
     this.app.use('/api/admin/recharge', adminRechargeRoutes);
     this.app.use('/api/admin/system', adminSystemRoutes);
 
-    // 静态文件服务（用于用户头像等）
-    this.app.use('/uploads', express.static('uploads'));
-
-    // 前端静态文件服务（生产环境）
+    // 前端路由回退（SPA）- 生产环境
     if (config.app.env === 'production') {
-      // 服务前端构建文件
-      this.app.use(express.static(path.join(__dirname, '../client/dist')));
-
-      // 处理前端路由回退（SPA）
       this.app.get('*', (req, res) => {
         // 如果是API请求，不处理
         if (req.path.startsWith('/api')) {
