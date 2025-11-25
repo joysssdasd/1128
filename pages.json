@@ -1,0 +1,14 @@
+{
+  "name": "trading-match-platform",
+  "buildCommand": "npm run build",
+  "outputDirectory": ".",
+  "installCommand": "npm install",
+  "env": {
+    "NODE_ENV": "production"
+  },
+  "functions": {
+    "api/*.js": {
+      "runtime": "nodejs18"
+    }
+  }
+}
