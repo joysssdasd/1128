@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Post, PostFilters, PaginationParams, PaginatedResponse } from '../types/api';
+import type { Post, PostFilters, PaginationParams } from '../types/api';
 
 interface PostState {
   posts: Post[];
