@@ -177,6 +177,32 @@ class Server {
     // 静态文件服务（用于用户头像等）
     this.app.use('/uploads', express.static('uploads'));
 
+    // 前端静态文件服务（生产环境）
+    if (config.app.env === 'production') {
+      // 服务前端构建文件
+      this.app.use(express.static(path.join(__dirname, '../../client/dist')));
+
+      // 处理前端路由回退（SPA）
+      this.app.get('*', (req, res) => {
+        // 如果是API请求，不处理
+        if (req.path.startsWith('/api')) {
+          return res.status(404).json({
+            success: false,
+            message: 'API接口不存在',
+            path: req.path
+          });
+        }
+
+        // 如果是静态资源请求，让express.static处理
+        if (req.path.match(/\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$/)) {
+          return res.status(404).send('文件未找到');
+        }
+
+        // 其他所有请求都返回index.html（SPA路由）
+        res.sendFile(path.join(__dirname, '../../client/dist/index.html'));
+      });
+    }
+
     // API文档（开发环境）
     if (config.app.env === 'development') {
       this.app.get('/api', (req, res) => {
