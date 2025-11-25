@@ -22,7 +22,7 @@ export const postController = {
     };
 
     // 关键词搜索
-    if (keyword) {
+    if (keyword && typeof keyword === 'string') {
       where.OR = buildSearchCondition(keyword, ['title', 'keywords']);
     }
 
@@ -38,15 +38,20 @@ export const postController = {
       if (priceRange.max !== undefined) where.price.lte = priceRange.max;
     }
 
-    // 排序规则：成交率降序(70%) + 发布时间倒序(30%)
-    const orderBy = sortBy === 'createdAt'
-      ? [{ dealRate: 'desc' as const }, { createdAt: 'desc' as const }]
-      : [{ [sortBy]: sortOrder as 'asc' | 'desc' }, { dealRate: 'desc' as const }];
+    // 排序规则
+    const orderBy: any[] = [
+      { dealRate: 'desc' }
+    ];
+
+    // 动态添加排序字段
+    if (sortBy && typeof sortBy === 'string') {
+      orderBy.push({ [sortBy]: sortOrder });
+    }
 
     // 查询总数和数据
     const [total, posts] = await Promise.all([
-      prisma.post.count({ where }),
-      prisma.post.findMany({
+      prisma?.post.count({ where }) || Promise.resolve(0),
+      prisma?.post.findMany({
         where,
         include: {
           user: {
@@ -58,10 +63,10 @@ export const postController = {
             }
           }
         },
-        orderBy,
+        orderBy: orderBy as any,
         skip: offset,
         take: limit
-      })
+      }) || Promise.resolve([])
     ]);
 
     const meta = createPaginationMeta(total, page, limit);
@@ -73,7 +78,7 @@ export const postController = {
   getPost: asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
 
-    const post = await prisma.post.findUnique({
+    const post = await prisma?.post.findUnique({
       where: { id: BigInt(id) },
       include: {
         user: {
@@ -161,7 +166,7 @@ export const postController = {
     const updateData = req.body;
 
     // 检查交易信息是否存在且属于当前用户
-    const post = await prisma.post.findFirst({
+    const post = await prisma?.post.findFirst({
       where: {
         id: BigInt(id),
         userId,
@@ -190,12 +195,12 @@ export const postController = {
       updateData.deliveryDate = new Date(updateData.deliveryDate);
     }
 
-    const updatedPost = await prisma.post.update({
+    const updatedPost = await prisma?.post.update({
       where: { id: BigInt(id) },
       data: updateData
     });
 
-    logger.business('更新交易信息', userId.toString(), { postId: BigInt(id), title: updatedPost.title });
+    logger.business('更新交易信息', userId.toString(), { postId: BigInt(id), title: updatedPost?.title });
 
     ApiResponseUtil.success(res, '更新成功', updatedPost);
   }),
@@ -206,7 +211,7 @@ export const postController = {
     const userId = req.user!.id;
 
     // 检查交易信息是否存在且属于当前用户
-    const post = await prisma.post.findFirst({
+    const post = await prisma?.post.findFirst({
       where: {
         id: BigInt(id),
         userId
@@ -257,7 +262,7 @@ export const postController = {
     const userId = req.user!.id;
     const { status } = req.body;
 
-    const post = await prisma.post.findFirst({
+    const post = await prisma?.post.findFirst({
       where: {
         id: BigInt(id),
         userId
@@ -268,7 +273,7 @@ export const postController = {
       throw new ValidationError('交易信息不存在或无权限操作');
     }
 
-    const updatedPost = await prisma.post.update({
+    const updatedPost = await prisma?.post.update({
       where: { id: BigInt(id) },
       data: {
         status: status as PostStatus,
@@ -287,7 +292,7 @@ export const postController = {
     const { id } = req.params;
     const userId = req.user!.id;
 
-    const post = await prisma.post.findUnique({
+    const post = await prisma?.post.findUnique({
       where: { id: BigInt(id) },
       include: {
         user: {
@@ -304,12 +309,10 @@ export const postController = {
     }
 
     // 检查是否已查看过
-    const existingView = await prisma.postView.findUnique({
+    const existingView = await prisma?.postView.findFirst({
       where: {
-        postId_postId: {
-          postId: BigInt(id),
-          userId: userId
-        }
+        postId: BigInt(id),
+        userId: userId
       }
     });
 
@@ -370,12 +373,10 @@ export const postController = {
     const { isDealt } = req.body;
     const userId = req.user!.id;
 
-    const postView = await prisma.postView.findUnique({
+    const postView = await prisma?.postView.findFirst({
       where: {
-        postId_postId: {
-          postId: BigInt(id),
-          userId: userId
-        }
+        postId: BigInt(id),
+        userId: userId
       },
       include: {
         post: {
@@ -386,7 +387,7 @@ export const postController = {
       }
     });
 
-    if (!postView) {
+    if (!postView || !postView.post) {
       throw new ValidationError('请先查看联系方式后再标记成交');
     }
 
@@ -395,7 +396,7 @@ export const postController = {
     }
 
     // 更新成交状态
-    const updatedView = await prisma.postView.update({
+    const updatedView = await prisma?.postView.update({
       where: { id: postView.id },
       data: {
         isDealt,
@@ -449,8 +450,8 @@ export const postController = {
     const userId = req.user!.id;
 
     const [total, posts] = await Promise.all([
-      prisma.post.count({ where: { userId } }),
-      prisma.post.findMany({
+      prisma?.post.count({ where: { userId } }) || Promise.resolve(0),
+      prisma?.post.findMany({
         where: { userId },
         include: {
           user: {
@@ -464,7 +465,7 @@ export const postController = {
         orderBy: { createdAt: 'desc' },
         skip: offset,
         take: limit
-      })
+      }) || Promise.resolve([])
     ]);
 
     const meta = createPaginationMeta(total, page, limit);
@@ -474,7 +475,8 @@ export const postController = {
 
   // 搜索交易信息
   searchPosts: asyncHandler(async (req: Request, res: Response) => {
-    const { keyword, tradeType, priceRange } = req.query;
+    const { keyword, tradeType } = req.query;
+    const priceRange = req.query.priceRange as any;
     const { page, limit, offset } = formatPaginationParams(req.query);
 
     const where: any = {
@@ -483,8 +485,8 @@ export const postController = {
     };
 
     // 关键词搜索
-    if (keyword) {
-      where.OR = buildSearchCondition(keyword as string, ['title', 'keywords']);
+    if (keyword && typeof keyword === 'string') {
+      where.OR = buildSearchCondition(keyword, ['title', 'keywords']);
     }
 
     // 交易类型筛选
@@ -500,8 +502,8 @@ export const postController = {
     }
 
     const [total, posts] = await Promise.all([
-      prisma.post.count({ where }),
-      prisma.post.findMany({
+      prisma?.post.count({ where }) || Promise.resolve(0),
+      prisma?.post.findMany({
         where,
         include: {
           user: {
@@ -513,12 +515,11 @@ export const postController = {
           }
         },
         orderBy: [
-          { dealRate: 'desc' },
           { createdAt: 'desc' }
-        ],
+        ] as any,
         skip: offset,
         take: limit
-      })
+      }) || Promise.resolve([])
     ]);
 
     const meta = createPaginationMeta(total, page, limit);

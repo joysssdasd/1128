@@ -7,7 +7,7 @@ import { adminSchemas } from '../../middleware/validation';
 const router = Router();
 
 // 管理员登录
-router.post('/login', validate(adminSchemas.login), adminAuthController.login);
+router.post('/login', validate({ body: adminSchemas.login.shape.body }), adminAuthController.login);
 
 // 需要管理员认证的路由
 router.use(authenticateAdmin);

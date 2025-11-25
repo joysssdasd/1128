@@ -20,7 +20,7 @@ export const authController = {
 
     // 检查手机号是否已注册（注册时需要检查）
     if (type === 'register') {
-      const existingUser = await prisma.user.findUnique({
+      const existingUser = await prisma?.user.findUnique({
         where: { phone }
       });
 
@@ -61,7 +61,7 @@ export const authController = {
     }
 
     // 检查手机号是否已注册
-    const existingUser = await prisma.user.findUnique({
+    const existingUser = await prisma?.user.findUnique({
       where: { phone }
     });
 
@@ -75,7 +75,7 @@ export const authController = {
     }
 
     // 验证微信号是否已被使用
-    const existingWechat = await prisma.user.findUnique({
+    const existingWechat = await prisma?.user.findUnique({
       where: { wechatId }
     });
 
@@ -86,8 +86,8 @@ export const authController = {
     let inviterId: bigint | null = null;
 
     // 处理邀请码
-    if (inviteCode) {
-      const invitation = await prisma.invitation.findUnique({
+    if (inviteCode && prisma) {
+      const invitation = await prisma?.invitation.findFirst({
         where: { inviteCode }
       });
 
@@ -173,7 +173,7 @@ export const authController = {
     }
 
     // 查找用户
-    const user = await prisma.user.findUnique({
+    const user = await prisma?.user.findUnique({
       where: { phone }
     });
 

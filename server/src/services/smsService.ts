@@ -78,7 +78,7 @@ export class SmsService {
       logger.business('短信请求参数', undefined, requestParams);
 
       const response = await axios.get(
-        config.sms.url,
+        config.sms.url || '',
         {
           params: requestParams,
           timeout: 10000,

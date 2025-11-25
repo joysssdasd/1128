@@ -4,9 +4,9 @@ import { ValidationError } from './errorHandler';
 
 // 通用验证中间件工厂
 export const validate = (schema: {
-  body?: z.ZodSchema;
-  query?: z.ZodSchema;
-  params?: z.ZodSchema;
+  body?: any;
+  query?: any;
+  params?: any;
 }) => {
   return (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -14,7 +14,7 @@ export const validate = (schema: {
       if (schema.body) {
         const result = schema.body.safeParse(req.body);
         if (!result.success) {
-          const errors = result.error.errors.map(error => ({
+          const errors = (result.error as any).issues.map((error: any) => ({
             field: error.path.join('.'),
             message: error.message,
             code: error.code,
@@ -28,28 +28,28 @@ export const validate = (schema: {
       if (schema.query) {
         const result = schema.query.safeParse(req.query);
         if (!result.success) {
-          const errors = result.error.errors.map(error => ({
+          const errors = (result.error as any).issues.map((error: any) => ({
             field: error.path.join('.'),
             message: error.message,
             code: error.code,
           }));
           throw new ValidationError('查询参数验证失败', errors);
         }
-        req.query = result.data;
+        req.query = result.data as any;
       }
 
       // 验证路径参数
       if (schema.params) {
         const result = schema.params.safeParse(req.params);
         if (!result.success) {
-          const errors = result.error.errors.map(error => ({
+          const errors = (result.error as any).issues.map((error: any) => ({
             field: error.path.join('.'),
             message: error.message,
             code: error.code,
           }));
           throw new ValidationError('路径参数验证失败', errors);
         }
-        req.params = result.data;
+        req.params = result.data as any;
       }
 
       next();
@@ -114,9 +114,7 @@ export const commonSchemas = {
     .max(99999999.99, '价格超出最大限制'),
 
   // 交易类型
-  tradeType: z.enum(['BUY', 'SELL', 'LONG', 'SHORT'], {
-    errorMap: () => ({ message: '无效的交易类型' }),
-  }),
+  tradeType: z.enum(['BUY', 'SELL', 'LONG', 'SHORT']),
 
   // 交割时间
   deliveryDate: z.coerce.date()
@@ -173,9 +171,7 @@ export const userSchemas = {
   sendSms: z.object({
     body: z.object({
       phone: commonSchemas.phone,
-      type: z.enum(['register', 'login', 'reset_password'], {
-        errorMap: () => ({ message: '无效的验证码类型' }),
-      }),
+      type: z.enum(['register', 'login', 'reset_password']),
     }),
   }),
 
@@ -221,12 +217,8 @@ export const postSchemas = {
       keyword: commonSchemas.searchKeyword.optional(),
       tradeType: commonSchemas.tradeType.optional(),
       priceRange: commonSchemas.priceRange.optional(),
-      sortBy: z.enum(['createdAt', 'price', 'dealRate', 'viewCount'], {
-        errorMap: () => ({ message: '无效的排序字段' }),
-      }).default('createdAt'),
-      sortOrder: z.enum(['asc', 'desc'], {
-        errorMap: () => ({ message: '无效的排序方向' }),
-      }).default('desc'),
+      sortBy: z.enum(['createdAt', 'price', 'dealRate', 'viewCount']).default('createdAt'),
+      sortOrder: z.enum(['asc', 'desc']).default('desc'),
     }),
   }),
 
@@ -286,9 +278,7 @@ export const adminSchemas = {
         .regex(/^[a-zA-Z0-9_-]+$/, '用户名只能包含字母、数字、下划线和横线'),
       password: commonSchemas.password,
       email: z.string().email('邮箱格式不正确').optional(),
-      role: z.enum(['SUPER_ADMIN', 'ADMIN', 'EDITOR', 'VIEWER'], {
-        errorMap: () => ({ message: '无效的管理员角色' }),
-      }),
+      role: z.enum(['SUPER_ADMIN', 'ADMIN', 'EDITOR', 'VIEWER']),
       permissions: z.array(z.string()).default([]),
     }),
   }),
@@ -304,9 +294,7 @@ export const adminSchemas = {
         .optional(),
       password: commonSchemas.password.optional(),
       email: z.string().email('邮箱格式不正确').optional(),
-      role: z.enum(['SUPER_ADMIN', 'ADMIN', 'EDITOR', 'VIEWER'], {
-        errorMap: () => ({ message: '无效的管理员角色' }),
-      }).optional(),
+      role: z.enum(['SUPER_ADMIN', 'ADMIN', 'EDITOR', 'VIEWER']).optional(),
       permissions: z.array(z.string()).optional(),
       isActive: z.boolean().optional(),
     }),
@@ -316,9 +304,7 @@ export const adminSchemas = {
   manageUser: z.object({
     params: commonSchemas.idParam,
     body: z.object({
-      status: z.enum(['ACTIVE', 'DISABLED', 'BANNED'], {
-        errorMap: () => ({ message: '无效的用户状态' }),
-      }).optional(),
+      status: z.enum(['ACTIVE', 'DISABLED', 'BANNED']).optional(),
       points: z.number().int().optional(),
     }),
   }),

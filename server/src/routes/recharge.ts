@@ -10,7 +10,7 @@ const router = Router();
 router.use(authenticateUser);
 
 // 创建充值订单
-router.post('/orders', validate(rechargeSchemas.create), rechargeController.createOrder);
+router.post('/orders', validate({ body: rechargeSchemas.create.shape.body }), rechargeController.createOrder);
 
 // 获取充值订单列表
 router.get('/orders', rechargeController.getOrders);

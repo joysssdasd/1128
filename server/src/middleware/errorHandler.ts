@@ -139,7 +139,7 @@ export const errorHandler = (
       err = new ValidationError('数据验证失败');
     } else if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
       err = handleJWTError(error);
-    } else if (error.code) {
+    } else if ((error as any).code) {
       // Prisma或数据库错误
       err = handleDatabaseError(error);
     } else {
@@ -150,7 +150,7 @@ export const errorHandler = (
   }
 
   // 记录错误日志
-  if (err.statusCode >= 500) {
+  if ((err as any).statusCode >= 500) {
     logger.error('服务器错误:', {
       error: err.message,
       stack: err.stack,

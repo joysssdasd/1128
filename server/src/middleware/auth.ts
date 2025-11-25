@@ -84,7 +84,7 @@ export const authenticateUser = async (req: Request, res: Response, next: NextFu
     const decoded = jwt.verify(token, config.jwt.secret) as JWTPayload;
 
     // 从数据库获取用户信息
-    const user = await prisma.user.findUnique({
+    const user = await prisma?.user.findUnique({
       where: { id: decoded.userId },
       select: {
         id: true,
@@ -105,7 +105,10 @@ export const authenticateUser = async (req: Request, res: Response, next: NextFu
     }
 
     // 将用户信息添加到请求对象
-    req.user = user;
+    req.user = {
+      ...user,
+      dealRate: Number(user.dealRate)
+    };
 
     logger.security('User authenticated', user.id.toString(), req.ip);
 
@@ -139,7 +142,7 @@ export const authenticateAdmin = async (req: Request, res: Response, next: NextF
     const decoded = jwt.verify(token, config.jwt.secret) as AdminJWTPayload;
 
     // 从数据库获取管理员信息
-    const admin = await prisma.adminUser.findUnique({
+    const admin = await prisma?.adminUser.findUnique({
       where: { id: decoded.adminId },
       select: {
         id: true,
@@ -190,7 +193,7 @@ export const optionalAuth = async (req: Request, res: Response, next: NextFuncti
     const token = authHeader.substring(7);
     const decoded = jwt.verify(token, config.jwt.secret) as JWTPayload;
 
-    const user = await prisma.user.findUnique({
+    const user = await prisma?.user.findUnique({
       where: { id: decoded.userId },
       select: {
         id: true,
@@ -203,7 +206,10 @@ export const optionalAuth = async (req: Request, res: Response, next: NextFuncti
     });
 
     if (user && user.status === 'ACTIVE') {
-      req.user = user;
+      req.user = {
+        ...user,
+        dealRate: Number(user.dealRate)
+      };
     }
 
     next();

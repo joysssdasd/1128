@@ -216,7 +216,7 @@ export const formatSortParams = (
   }
 
   return {
-    orderBy: { [sortBy]: sortOrder as 'asc' | 'desc' as const },
+    orderBy: { [sortBy]: sortOrder as 'asc' | 'desc' },
   };
 };
 

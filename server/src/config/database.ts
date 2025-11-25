@@ -7,7 +7,7 @@ declare global {
 }
 
 // 避免在开发环境下创建多个Prisma实例
-let prisma: PrismaClient | null = null;
+let prisma: PrismaClient | undefined = undefined;
 
 // 只有在有数据库URL时才创建Prisma客户端
 if (config.database.url) {
@@ -46,28 +46,23 @@ if (config.database.url) {
   logger.warn('未配置数据库URL，将在无数据库模式下运行');
 }
 
-if (process.env.NODE_ENV === 'development') {
+if (process.env.NODE_ENV === 'development' && prisma) {
   globalThis.__prisma = prisma;
 }
 
-// Prisma日志事件监听
+// 简化Prisma事件监听
 if (prisma) {
-  prisma.$on('query', (e) => {
-    logger.debug('Query: ' + e.query);
-    logger.debug('Params: ' + e.params);
-    logger.debug('Duration: ' + e.duration + 'ms');
-  });
+  // 只在开发环境启用详细日志
+  if (process.env.NODE_ENV === 'development') {
+    (prisma as any).$on('query', (e: any) => {
+      logger.debug('Query: ' + e.query);
+      logger.debug('Params: ' + e.params);
+      logger.debug('Duration: ' + e.duration + 'ms');
+    });
+  }
 
-  prisma.$on('error', (e) => {
+  (prisma as any).$on('error', (e: any) => {
     logger.error('Database error:', e);
-  });
-
-  prisma.$on('info', (e) => {
-    logger.info('Database info:', e.message);
-  });
-
-  prisma.$on('warn', (e) => {
-    logger.warn('Database warning:', e.message);
   });
 }
 

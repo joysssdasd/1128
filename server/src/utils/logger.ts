@@ -33,7 +33,7 @@ class Logger {
       mkdirSync(logDir, { recursive: true });
     }
 
-    this.logStream = createWriteStream(logFile, { flags: 'a' });
+    this.logStream = createWriteStream(logFile, { flags: 'a' }) as any;
   }
 
   public static getInstance(): Logger {
