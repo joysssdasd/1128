@@ -39,8 +39,8 @@ export const PostFilter: React.FC<PostFilterProps> = ({
     const newPriceRange = { ...priceRange, [type]: value };
     setPriceRange(newPriceRange);
 
-    const min = type === 'min' ? parseFloat(value) : priceRange.min ? parseFloat(priceRange.min) : undefined;
-    const max = type === 'max' ? parseFloat(value) : priceRange.max ? parseFloat(priceRange.max) : undefined;
+    const min = type === 'min' ? parseFloat(value) : priceRange.min ? parseFloat(priceRange.min as string) : undefined;
+    const max = type === 'max' ? parseFloat(value) : priceRange.max ? parseFloat(priceRange.max as string) : undefined;
 
     onFiltersChange({
       ...filters,
