@@ -11,7 +11,7 @@
     "server:build": "tsc -p server/tsconfig.json",
     "client:install": "cd client && npm install",
     "client:build": "cd client && npm run build",
-    "start": "node dist/server.js",
+    "start": "node app.js",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
