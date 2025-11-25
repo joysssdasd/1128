@@ -116,16 +116,6 @@ export const PublishPage: React.FC = () => {
     }
   };
 
-  const getTradeTypeText = (type: TradeType) => {
-    const map = {
-      'BUY': '买入',
-      'SELL': '卖出',
-      'LONG': '做多',
-      'SHORT': '做空'
-    };
-    return map[type];
-  };
-
   const getMinDeliveryDate = () => {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
