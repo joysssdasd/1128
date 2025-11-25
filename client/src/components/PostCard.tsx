@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Post } from '../types/api';
+import type { Post } from '../types/api';
 import { usePostStore } from '../stores/postStore';
 import { useAuthStore } from '../stores/authStore';
 
