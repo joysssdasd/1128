@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuthStore } from '../stores/authStore';
 import { usePostStore } from '../stores/postStore';
-import { TradeType } from '../types/api';
+import type { TradeType } from '../types/api';
 
 export const PublishPage: React.FC = () => {
   const { user } = useAuthStore();
