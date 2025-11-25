@@ -25,6 +25,37 @@ export interface PaginationMeta {
 }
 
 export class ApiResponseUtil {
+  // 序列化BigInt为字符串
+  private static serializeBigInt(obj: any): any {
+    if (obj === null || obj === undefined) {
+      return obj;
+    }
+
+    if (typeof obj === 'bigint') {
+      return obj.toString();
+    }
+
+    if (obj instanceof Date) {
+      return obj;
+    }
+
+    if (Array.isArray(obj)) {
+      return obj.map(item => this.serializeBigInt(item));
+    }
+
+    if (typeof obj === 'object') {
+      const serialized: any = {};
+      for (const key in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, key)) {
+          serialized[key] = this.serializeBigInt(obj[key]);
+        }
+      }
+      return serialized;
+    }
+
+    return obj;
+  }
+
   private static createResponse<T>(
     res: Response,
     statusCode: number,
@@ -41,7 +72,7 @@ export class ApiResponseUtil {
     };
 
     if (data !== undefined) {
-      response.data = data;
+      response.data = this.serializeBigInt(data);
     }
 
     if (meta) {

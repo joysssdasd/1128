@@ -38,9 +38,9 @@ export const postController = {
       if (priceRange.max !== undefined) where.price.lte = priceRange.max;
     }
 
-    // 排序规则
+    // 排序规则 - 先按用户成交率排序，再按其他条件排序
     const orderBy: any[] = [
-      { dealRate: 'desc' }
+      { user: { dealRate: 'desc' } }
     ];
 
     // 动态添加排序字段
