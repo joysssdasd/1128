@@ -9,6 +9,7 @@
     "client:dev": "cd client && npm run dev",
     "build": "npm run server:build && npm run client:install && npm run client:build",
     "server:build": "tsc -p server/tsconfig.json",
+    "client:install": "cd client && npm install",
     "client:build": "cd client && npm run build",
     "start": "node dist/server.js",
     "test": "jest",
