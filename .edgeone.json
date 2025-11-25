@@ -1,0 +1,35 @@
+{
+  "name": "trading-match-platform",
+  "buildCommand": "npm run build",
+  "outputDirectory": ".",
+  "installCommand": "npm install",
+  "framework": {
+    "name": "custom"
+  },
+  "functions": {
+    "api/*.js": {
+      "runtime": "nodejs18"
+    }
+  },
+  "env": {
+    "NODE_ENV": "production"
+  },
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/index.js"
+    },
+    {
+      "src": "/assets/(.*)",
+      "dest": "/client/dist/assets/$1"
+    },
+    {
+      "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot))",
+      "dest": "/client/dist/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/app.js"
+    }
+  ]
+}
