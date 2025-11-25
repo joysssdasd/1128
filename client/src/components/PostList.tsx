@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import type { Post, PostFilters, PaginationParams } from '../types/api';
+import type { PostFilters, PaginationParams } from '../types/api';
 import { usePostStore } from '../stores/postStore';
 import { PostCard } from './PostCard';
 
