@@ -180,7 +180,7 @@ class Server {
     // 前端静态文件服务（生产环境）
     if (config.app.env === 'production') {
       // 服务前端构建文件
-      this.app.use(express.static(path.join(__dirname, '../../client/dist')));
+      this.app.use(express.static(path.join(__dirname, '../client/dist')));
 
       // 处理前端路由回退（SPA）
       this.app.get('*', (req, res) => {
@@ -199,7 +199,7 @@ class Server {
         }
 
         // 其他所有请求都返回index.html（SPA路由）
-        res.sendFile(path.join(__dirname, '../../client/dist/index.html'));
+        res.sendFile(path.join(__dirname, '../client/dist/index.html'));
       });
     }
 
