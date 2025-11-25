@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useAuthStore } from '../stores/authStore';
 import { usePostStore } from '../stores/postStore';
-import { PostCard } from '../components/PostCard';
 
 export const ProfilePage: React.FC = () => {
-  const { user, logout } = useAuthStore();
-  const { myPosts, fetchMyPosts, pagination, isLoading, deletePost, updatePostStatus } = usePostStore();
+  const { user } = useAuthStore();
+  const { myPosts, fetchMyPosts, pagination, isLoading, deletePost } = usePostStore();
   const [activeTab, setActiveTab] = useState<'posts' | 'points' | 'stats'>('posts');
-  const [pointsHistory, setPointsHistory] = useState<any[]>([]);
+  const [pointsHistory] = useState<any[]>([]);
 
   useEffect(() => {
     if (user) {
