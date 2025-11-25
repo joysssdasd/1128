@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TradeType, PostFilters } from '../types/api';
+import type { TradeType, PostFilters } from '../types/api';
 
 interface PostFilterProps {
   filters: PostFilters;
