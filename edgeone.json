@@ -1,0 +1,13 @@
+{
+  "name": "trading-match-platform",
+  "build": {
+    "command": "cd client && npm install && npm run build",
+    "output": "client/dist"
+  },
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ]
+}
