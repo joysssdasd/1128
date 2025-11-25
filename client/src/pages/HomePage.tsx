@@ -7,7 +7,7 @@ import { PostList } from '../components/PostList';
 
 export const HomePage: React.FC = () => {
   const { user, isAuthenticated } = useAuthStore();
-  const { posts, pagination } = usePostStore();
+  const { pagination } = usePostStore();
 
   const [filters, setFilters] = useState<PostFilters>({});
   const [searchKeyword, setSearchKeyword] = useState('');
