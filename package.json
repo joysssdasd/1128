@@ -7,7 +7,7 @@
     "dev": "concurrently \"npm run server:dev\" \"npm run client:dev\"",
     "server:dev": "tsx watch server/src/server.ts",
     "client:dev": "cd client && npm run dev",
-    "build": "npm run server:build && npm run client:build",
+    "build": "npm run server:build && npm run client:install && npm run client:build",
     "server:build": "tsc -p server/tsconfig.json",
     "client:build": "cd client && npm run build",
     "start": "node dist/server.js",
