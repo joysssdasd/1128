@@ -1,26 +1,10 @@
 import React from 'react';
-
-export interface Post {
-  id: string;
-  title: string;
-  price: number;
-  tradeType: 'BUY' | 'SELL' | 'LONG' | 'SHORT';
-  userId: string;
-  userName?: string;
-  userAvatar?: string;
-  viewLimit: number;
-  viewCount: number;
-  dealCount: number;
-  dealRate: number;
-  keywords: string[];
-  expireAt: string;
-  createdAt: string;
-}
+import type { Post } from '../../types/api';
 
 interface ModernPostCardProps {
   post: Post;
-  onViewContact: (postId: string) => void;
-  onViewDetail: (postId: string) => void;
+  onViewContact: (postId: number) => void;
+  onViewDetail: (postId: number) => void;
 }
 
 export const ModernPostCard: React.FC<ModernPostCardProps> = ({
@@ -107,6 +91,9 @@ export const ModernPostCard: React.FC<ModernPostCardProps> = ({
   const isExpired = new Date(post.expireAt) < new Date();
   const viewProgress = (post.viewCount / post.viewLimit) * 100;
 
+  // 将keywords字符串转换为数组
+  const keywordsArray = post.keywords ? post.keywords.split(',').map(k => k.trim()).filter(k => k) : [];
+
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-all duration-200">
       {/* 顶部信息 */}
@@ -124,7 +111,7 @@ export const ModernPostCard: React.FC<ModernPostCardProps> = ({
               ¥{post.price.toLocaleString()}
             </div>
             <div className="text-xs text-gray-500">
-              {post.keywords[0] || '其他'}
+              {keywordsArray[0] || '其他'}
             </div>
           </div>
         </div>
@@ -139,7 +126,7 @@ export const ModernPostCard: React.FC<ModernPostCardProps> = ({
 
         {/* 关键词标签 */}
         <div className="flex flex-wrap gap-1 mb-3">
-          {post.keywords.slice(0, 3).map((keyword, index) => (
+          {keywordsArray.slice(0, 3).map((keyword, index) => (
             <span
               key={index}
               className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full"
@@ -147,9 +134,9 @@ export const ModernPostCard: React.FC<ModernPostCardProps> = ({
               {keyword}
             </span>
           ))}
-          {post.keywords.length > 3 && (
+          {keywordsArray.length > 3 && (
             <span className="text-xs text-gray-500">
-              +{post.keywords.length - 3}
+              +{keywordsArray.length - 3}
             </span>
           )}
         </div>
@@ -160,11 +147,11 @@ export const ModernPostCard: React.FC<ModernPostCardProps> = ({
             <div className="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center">
               <span className="text-xs">👤</span>
             </div>
-            <span className="text-xs">{post.userName || '匿名用户'}</span>
+            <span className="text-xs">{post.user.wechatId || '匿名用户'}</span>
           </div>
 
           <div className="flex items-center space-x-3">
-            {renderStars(post.dealRate)}
+            {renderStars(post.user.dealRate)}
             <span className="text-xs text-gray-500">
               {post.dealCount}成交
             </span>

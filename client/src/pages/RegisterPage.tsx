@@ -89,7 +89,7 @@ export const RegisterPage: React.FC = () => {
     // 开发环境直接成功
     if (formData.smsCode === '123456' || formData.smsCode.length === 6) {
       // 模拟注册成功并自动登录
-      const newUser = {
+      const _newUser = {
         id: Date.now().toString(),
         phone: formData.phone,
         wechatId: formData.wechatId,
@@ -101,7 +101,7 @@ export const RegisterPage: React.FC = () => {
         createdAt: new Date().toISOString(),
       };
 
-      login(newUser);
+      await login(formData.phone, formData.smsCode);
 
       showToast({
         type: 'success',
@@ -154,7 +154,7 @@ export const RegisterPage: React.FC = () => {
 
       if (data.success) {
         // 注册成功后自动登录
-        login(data.data);
+        await login(formData.phone, formData.smsCode);
 
         showToast({
           type: 'success',

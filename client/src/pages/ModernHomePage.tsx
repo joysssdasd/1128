@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
-import { usePostStore } from '../stores/postStore';
+// 移除不需要的导入
 import { useToast } from '../components/ui/Toast';
 import { BottomNav } from '../components/mobile/BottomNav';
 import { SearchBar } from '../components/mobile/SearchBar';
@@ -9,84 +9,8 @@ import { TradeTypeTabs, DEFAULT_TRADE_TYPES } from '../components/mobile/TradeTy
 import { ModernPostCard } from '../components/mobile/ModernPostCard';
 import type { Post } from '../types/api';
 
-// 模拟数据
-const mockPosts: Post[] = [
-  {
-    id: '1',
-    title: '求购USDT，价格优惠，诚信交易',
-    price: 7.2,
-    tradeType: 'BUY',
-    userId: 'user1',
-    userName: '老张',
-    viewLimit: 20,
-    viewCount: 8,
-    dealCount: 15,
-    dealRate: 95,
-    keywords: ['USDT', '数字货币', '线下交易'],
-    expireAt: '2024-12-31T23:59:59Z',
-    createdAt: '2024-11-25T10:30:00Z',
-  },
-  {
-    id: '2',
-    title: '出售比特币，支持多种支付方式',
-    price: 95000,
-    tradeType: 'SELL',
-    userId: 'user2',
-    userName: '小李',
-    viewLimit: 15,
-    viewCount: 12,
-    dealCount: 23,
-    dealRate: 88,
-    keywords: ['BTC', '比特币', '银行转账'],
-    expireAt: '2024-12-25T23:59:59Z',
-    createdAt: '2024-11-25T09:15:00Z',
-  },
-  {
-    id: '3',
-    title: '做多以太坊，专业分析师带单',
-    price: 3500,
-    tradeType: 'LONG',
-    userId: 'user3',
-    userName: '王老师',
-    viewLimit: 30,
-    viewCount: 5,
-    dealCount: 42,
-    dealRate: 92,
-    keywords: ['ETH', '以太坊', '杠杆交易'],
-    expireAt: '2024-12-20T23:59:59Z',
-    createdAt: '2024-11-25T08:45:00Z',
-  },
-  {
-    id: '4',
-    title: '稳定币USDT出售，量大价优',
-    price: 7.15,
-    tradeType: 'SELL',
-    userId: 'user4',
-    userName: '数字货币商',
-    viewLimit: 50,
-    viewCount: 25,
-    dealCount: 67,
-    dealRate: 98,
-    keywords: ['USDT', '稳定币', '批发'],
-    expireAt: '2024-12-15T23:59:59Z',
-    createdAt: '2024-11-24T16:20:00Z',
-  },
-  {
-    id: '5',
-    title: '做空策略分享，专业风控团队',
-    price: 100,
-    tradeType: 'SHORT',
-    userId: 'user5',
-    userName: '交易大师',
-    viewLimit: 25,
-    viewCount: 18,
-    dealCount: 31,
-    dealRate: 85,
-    keywords: ['做空', '策略', '风控'],
-    expireAt: '2024-12-28T23:59:59Z',
-    createdAt: '2024-11-24T14:10:00Z',
-  },
-];
+// 暂时使用空数组，等待API对接
+const mockPosts: Post[] = [];
 
 export const ModernHomePage: React.FC = () => {
   const navigate = useNavigate();
@@ -141,9 +65,7 @@ export const ModernHomePage: React.FC = () => {
     if (searchKeyword) {
       filtered = filtered.filter(post =>
         post.title.toLowerCase().includes(searchKeyword.toLowerCase()) ||
-        post.keywords.some(keyword =>
-          keyword.toLowerCase().includes(searchKeyword.toLowerCase())
-        )
+        post.keywords.toLowerCase().includes(searchKeyword.toLowerCase())
       );
     }
 
@@ -166,7 +88,7 @@ export const ModernHomePage: React.FC = () => {
   };
 
   // 查看联系方式
-  const handleViewContact = (postId: string) => {
+  const handleViewContact = (postId: number) => {
     if (!isAuthenticated) {
       showToast({
         type: 'warning',
@@ -196,12 +118,12 @@ export const ModernHomePage: React.FC = () => {
   };
 
   // 查看详情
-  const handleViewDetail = (postId: string) => {
+  const handleViewDetail = (postId: number) => {
     navigate(`/post/${postId}`);
   };
 
   // 下拉刷新
-  const handleRefresh = async () => {
+  const _handleRefresh = async () => {
     setIsLoading(true);
 
     // 模拟API调用
@@ -223,19 +145,25 @@ export const ModernHomePage: React.FC = () => {
     setTimeout(() => {
       const newPosts: Post[] = [
         {
-          id: `${posts.length + 1}`,
+          id: posts.length + 1,
           title: '新加载的交易信息',
           price: Math.random() * 10000,
           tradeType: 'BUY',
-          userId: 'newuser',
-          userName: '新用户',
+          userId: 999,
+          keywords: '新,交易',
           viewLimit: 20,
           viewCount: 0,
           dealCount: 0,
-          dealRate: 100,
-          keywords: ['新', '交易'],
+          status: 'ACTIVE',
           expireAt: '2024-12-31T23:59:59Z',
           createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          user: {
+            id: 999,
+            wechatId: '新用户',
+            dealRate: 100,
+            totalPosts: 1,
+          },
         },
       ];
 

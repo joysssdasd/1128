@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ToastProvider } from './components/ui/Toast';
 import { ModernHomePage } from './pages/ModernHomePage';
 import { LoginPage } from './pages/LoginPage';
@@ -51,28 +51,6 @@ function App() {
   );
 }
 
-// 临时组件 - 后续会实现
-const MessagesPage: React.FC = () => (
-  <div className="min-h-screen bg-gray-50 p-4">
-    <div className="max-w-md mx-auto">
-      <h1 className="text-xl font-bold mb-4">消息中心</h1>
-      <div className="bg-white rounded-xl p-4 shadow-sm">
-        <p className="text-gray-500">暂无新消息</p>
-      </div>
-    </div>
-  </div>
-);
-
-const PostDetailPage: React.FC = () => (
-  <div className="min-h-screen bg-gray-50 p-4">
-    <div className="max-w-md mx-auto">
-      <h1 className="text-xl font-bold mb-4">交易详情</h1>
-      <div className="bg-white rounded-xl p-4 shadow-sm">
-        <p className="text-gray-500">详情页面开发中...</p>
-      </div>
-    </div>
-  </div>
-);
 
 const MyPostsPage: React.FC = () => (
   <div className="min-h-screen bg-gray-50 p-4">
@@ -118,27 +96,6 @@ const RechargePage: React.FC = () => (
   </div>
 );
 
-const AdminLoginPage: React.FC = () => (
-  <div className="min-h-screen bg-gray-50 p-4">
-    <div className="max-w-md mx-auto">
-      <h1 className="text-xl font-bold mb-4">管理员登录</h1>
-      <div className="bg-white rounded-xl p-4 shadow-sm">
-        <p className="text-gray-500">管理员登录页面开发中...</p>
-      </div>
-    </div>
-  </div>
-);
-
-const AdminDashboard: React.FC = () => (
-  <div className="min-h-screen bg-gray-50 p-4">
-    <div className="max-w-4xl mx-auto">
-      <h1 className="text-xl font-bold mb-4">管理后台</h1>
-      <div className="bg-white rounded-xl p-4 shadow-sm">
-        <p className="text-gray-500">管理后台开发中...</p>
-      </div>
-    </div>
-  </div>
-);
 
 const NotFoundPage: React.FC = () => (
   <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">

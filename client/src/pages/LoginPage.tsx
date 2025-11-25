@@ -87,17 +87,7 @@ export const LoginPage: React.FC = () => {
     // 开发环境直接成功
     if (formData.smsCode === '123456' || formData.smsCode.length === 6) {
       // 模拟登录成功
-      login({
-        id: '1',
-        phone: formData.phone,
-        wechatId: 'user123',
-        points: 100,
-        dealRate: 95,
-        totalPosts: 5,
-        totalDeals: 12,
-        status: 'ACTIVE',
-        createdAt: new Date().toISOString(),
-      });
+      await login(formData.phone, formData.smsCode);
 
       showToast({
         type: 'success',
@@ -140,7 +130,7 @@ export const LoginPage: React.FC = () => {
       const data = await response.json();
 
       if (data.success) {
-        login(data.data);
+        await login(formData.phone, formData.smsCode);
 
         showToast({
           type: 'success',
