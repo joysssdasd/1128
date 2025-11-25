@@ -123,26 +123,32 @@ class Server {
   }
 
   private setupRoutes(): void {
-    // 根路由
+    // 根路由 - 生产环境返回前端页面，开发环境返回API信息
     this.app.get('/', (req, res) => {
-      res.json({
-        success: true,
-        message: '欢迎使用交易信息撮合平台 API',
-        timestamp: new Date().toISOString(),
-        data: {
-          name: config.app.name,
-          version: config.app.version,
-          environment: config.app.env,
-          endpoints: {
-            health: '/health',
-            api: '/api',
-            auth: '/api/auth',
-            posts: '/api/posts',
-            admin: '/api/admin'
+      // 生产环境返回前端index.html
+      if (config.app.env === 'production') {
+        res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+      } else {
+        // 开发环境返回API信息
+        res.json({
+          success: true,
+          message: '欢迎使用交易信息撮合平台 API',
+          timestamp: new Date().toISOString(),
+          data: {
+            name: config.app.name,
+            version: config.app.version,
+            environment: config.app.env,
+            endpoints: {
+              health: '/health',
+              api: '/api',
+              auth: '/api/auth',
+              posts: '/api/posts',
+              admin: '/api/admin'
+            },
+            documentation: '请访问 /api 查看完整API文档'
           },
-          documentation: '请访问 /api 查看完整API文档'
-        },
-      });
+        });
+      }
     });
 
     // 健康检查
