@@ -23,7 +23,9 @@
     "db:seed": "tsx prisma/seed.ts",
     "commit": "node auto-commit.js",
     "auto-commit": "node auto-commit.js",
-    "ac": "node auto-commit.js"
+    "ac": "node auto-commit.js",
+    "watch": "node watch-and-commit.js",
+    "monitor": "node watch-and-commit.js"
   },
   "keywords": [
     "trading",
