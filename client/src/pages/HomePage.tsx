@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuthStore } from '../stores/authStore';
 import { usePostStore } from '../stores/postStore';
-import { PostFilters } from '../types/api';
+import type { PostFilters } from '../types/api';
 import { PostFilter } from '../components/PostFilter';
 import { PostList } from '../components/PostList';
 
